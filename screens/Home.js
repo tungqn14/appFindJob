@@ -1,54 +1,44 @@
-import React from 'react';
+import React,{useEffect, useState} from 'react';
 import {ScrollView, StyleSheet,View,Text,Image, FlatList} from 'react-native';
 import BlockPost from '../component/BlockPost';
 import ItemCompany from '../component/ItemCompany';
 import ItemPost from '../component/ItemPost';
 import SearchBar from '../component/SearchBar';
+import { getTypeRank,getScale,getTypeTime } from '../provider/Helper';
+
 function Home({navigation}) {
-    const DATA = [
-        {
-          id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-          titlePost: 'Công ty TNHH một thành viên long thành',
-          address: 'Ha nội',
-          quantity: '200-300',
-        },
-        {
-          id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-          titlePost: 'Công ty TNHH sữa rau câu long hải',
-          address: 'Hà Giang',
-          quantity: '100-300',
-        },
-        {
-          id: '58694a0f-3da1-471f-bd96-145571e29d72',
-          titlePost: 'Công ty TNHH thuốc lá thăng long',
-          address: 'Hải phòng',
-          quantity: '50-100',
-        },
-        {
-            id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-            titlePost: 'Công ty TNHH một thành viên long thành',
-            address: 'Ha nội',
-            quantity: '200-300',
-          },
-          {
-            id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-            titlePost: 'Công ty TNHH sữa rau câu long hải',
-            address: 'Hà Giang',
-            quantity: '100-300',
-          },
-          {
-            id: '58694a0f-3da1-471f-bd96-145571e29d72',
-            titlePost: 'Công ty TNHH thuốc lá thăng long',
-            address: 'Hải phòng',
-            quantity: '50-100',
-          },
-      ];
+  const [dataCompany, setDataCompany] = useState([]);
+  const [dataPost, setDataPost] = useState([]);
+  useEffect(() => {
+      fetchDataCompany()
+  }, [dataCompany]);
+  useEffect(() => {
+    fetchDataPost()
+  }, [dataPost]);
+  fetchDataCompany = async() => {
+    const response = await fetch('https://tungfindjob.herokuapp.com/api/home')
+    .then(res => res.json())
+    .then(result => { 
+      setDataCompany(result.data.data);
+     })   
+    .catch(err => console.log(err))  
+  }
+  fetchDataPost = async() => {
+    const response = await fetch('https://tungfindjob.herokuapp.com/api/list-post-home')
+    .then(res => res.json())
+    .then(result => { 
+      setDataPost(result.datas.data)
+     })   
+    .catch(err => console.log(err))  
+  }
+  
       const linkDetailCompany = () =>{
         navigation.navigate("DetailCompany");
       }
       const linkDetailPost = () =>{
         navigation.navigate("DetailPost");
       }
+       console.log(dataPost);
     return (
          <ScrollView
         contentInsetAdjustmentBehavior="automatic"
@@ -63,6 +53,7 @@ function Home({navigation}) {
                <Text style={{color:"black",fontSize:20,marginTop:10,textAlign:"center"}}>Công nghệ dẫn đầu cuộc chơi</Text>
         </View>
             <SearchBar placeholder="Tìm kiếm "/>
+           
             <View style={styles.listPostVip}>
                 <Text style={styles.titleListPost}>Công ty tuyển dụng</Text>
                 <ScrollView  
@@ -70,8 +61,18 @@ function Home({navigation}) {
             showsHorizontalScrollIndicator
             style={{paddingVertical:5}}>
                   {
-                      DATA.map((item, index) => (
-                    <ItemCompany onPress={linkDetailCompany} key={index}  titlePost={item.titlePost} address={item.address} quantity={item.quantity}/>
+                    dataCompany.map((item, index) => (
+                    <ItemCompany onPress={() => {
+          /* 1. Navigate to the Details route with params */
+          navigation.navigate('DetailCompany', {
+            idCompany: item.id,
+            address:item.location.name,
+            street:item.users[0].address,
+            phone:item.users[0].phone,
+           
+          })
+
+        }} key={index}  titlePost={item.nameCompany} address={item.location.name} quantity={ getScale(item.scale)}/>
                   ))
                   }
                 </ScrollView> 
@@ -86,15 +87,18 @@ function Home({navigation}) {
             </View>
             <View style={styles.listPostVip}>
                 <Text style={styles.titleListPost}>Tin tuyển dụng</Text>
-                <ItemPost onPress={linkDetailPost} titlePost="Tuyển dụng lập trình viên" address="Hà Nội" wage="Thỏa thuận"/>
-                <ItemPost onPress={linkDetailPost} titlePost="Tuyển dụng lập trình viên và đây là đoạn text dài dụng lập trình viên và đây" address="Hà Nội" wage="Thỏa thuận"/>
-                <ItemPost onPress={linkDetailPost} titlePost="Tuyển dụng lập trình viên và đây là đoạn text dài" address="Hà Nội" wage="Thỏa thuận"/>
-                <ItemPost onPress={linkDetailPost} titlePost="Tuyển dụng lập trình viên và đây là đoạn text dài" address="Hà Nội" wage="Thỏa thuận"/>
+               {
+                dataPost.map((item, index) => (
+                    <ItemPost key={index} onPress={()=>{
+                       navigation.navigate('DetailPost', {
+                        idPost: item.id_post,
+          })
+                    }} titlePost={item.titlePost} address={item.users.company.location.name} wage={item.wage}/>
+                  )
+               )
+               }
+               
             </View>
-          
-           
-           
-           
         </ScrollView>
     )
 }

@@ -1,25 +1,49 @@
-import React from 'react';
+import React,{useEffect, useState} from 'react';
 import {ScrollView, StyleSheet,View,Text,Image} from 'react-native';
+import BlockCompany from '../component/BlockCompany';
 import BlockPost from '../component/BlockPost';
 import ItemCompany from '../component/ItemCompany';
 import SearchBar from '../component/SearchBar';
+import { getTypeRank,getScale,getTypeTime } from '../provider/Helper';
 
 export default function ListCompany({navigation}) {
     const PressDetailPost = ()=>{
         navigation.navigate("DetailPost");
     }
+    const [dataListCompany, setDataListCompany] = useState([]);
+  useEffect(() => {
+      fetchDataCompany()
+  }, [dataListCompany]);
+  fetchDataCompany = async() => {
+    const response = await fetch('https://tungfindjob.herokuapp.com/api/list-company')
+    .then(res => res.json())
+    .then(result => { 
+        setDataListCompany(result.data.data);
+     })   
+    .catch(err => console.log(err))  
+  }
+
     return (
          <ScrollView
       
         style={styles.container}>
         <Text style={{textAlign:"center",marginVertical:20,fontSize:22,fontWeight:"bold"}}>Danh sách công ty tuyển dụng</Text>
-            <ItemCompany  titlePost="công ty cái gì đó" address="Hà nội" quantity="100-200"/>
-            <ItemCompany  titlePost="công ty cái gì đó" address="Hà nội" quantity="100-200"/>
-            <ItemCompany  titlePost="công ty cái gì đó" address="Hà nội" quantity="100-200"/>
-            <ItemCompany  titlePost="công ty cái gì đó" address="Hà nội" quantity="100-200"/>
-            <ItemCompany  titlePost="công ty cái gì đó" address="Hà nội" quantity="100-200"/>
-            <ItemCompany  titlePost="công ty cái gì đó" address="Hà nội" quantity="100-200"/>
-            <ItemCompany  titlePost="công ty cái gì đó" address="Hà nội" quantity="100-200"/>
+            <View  style={{width:"80%",paddingHorizontal:10}}>
+            {
+                dataListCompany.map((item, index) => (
+                    <BlockCompany onPress={() => {
+        
+          navigation.navigate('DetailCompany', {
+            idCompany: item.id,
+            address:item.location.name,
+            street:item.users[0].address,
+            phone:item.users[0].phone,
+          })
+        }} key={index}  titlePost={item.nameCompany} address={item.location.name} quantity={ getScale(item.scale)}/>
+                  ))
+            }
+           
+            </View>
         </ScrollView>
     )
 }

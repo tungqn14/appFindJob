@@ -20,6 +20,7 @@ import AccountNavigation from './navigation/AcountNavigation';
 import FavoriteNavigation from './navigation/FavoriteNavigation';
 import CompanyNavigation from './navigation/CompanyNavigation';
 const Tab = createBottomTabNavigator();
+
 const App = () => {
   
   return (

@@ -1,6 +1,8 @@
-import React from 'react';
+import React,{useState,useEffect} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import BlockPost from '../component/BlockPost';
+import RenderHtml from 'react-native-render-html';
+import { getTypeRank,getScale,getTypeTime } from '../provider/Helper';
 import {
     Dimensions,
     Image,
@@ -14,49 +16,75 @@ import {
     TouchableOpacity,
     View,
   } from 'react-native';
+ const  widthContentHTML  = Dimensions.get('screen').width;
+export default function DetailPost({route, navigation}) {
+    const { idPost} = route.params;
+    const [detailPost,setDetailPost] = useState({});
+    const [skill,setSkill] = useState({});
+    const [welfare,setWelfare] = useState({});
+   
+  useEffect(() => {
+      fetchDetailPost()
+  }, [detailPost]);
 
-export default function DetailPost({onPress,text,titlePost,address,wage}) {
+  fetchDetailPost = async() => {
+    const response = await fetch(`https://tungfindjob.herokuapp.com/api/detail-post-${idPost}`)
+    .then(res => res.json())
+    .then(result => { 
+        setDetailPost(result.data.listPost);
+        setSkill(result.data.skills);
+        setWelfare(result.data.welfares);
+     })   
+    .catch(err => console.log(err))  
+  }
+  const sourceDes = {
+    html: `<div style='width:100%;'>${detailPost.desPost}</div>`
+  };
+  const sourceReq = {
+    html: `<div style='width:100%;'>${detailPost.reqPost}</div>`
+  };
 
     return (
         <ScrollView style={{flex:1,height:"100%"}}>
         <View style={styles.container}>
         <View style={styles.topDetailPost}>
-            <Text style={styles.titleDetailPost}>Tuyển dụng lập trình viên PHP và REACT NATIVE</Text>
+        
+            <Text style={styles.titleDetailPost}>{detailPost.titlePost}</Text>
             <View style={{width:"100%",borderBottomWidth:1,borderBottomColor:"#80808024",marginVertical:7,paddingBottom:10}}>
                 <Text style={{fontWeight:"bold",fontSize:16}}>Tên Công Ty:</Text>
-                <Text style={{paddingVertical:5,fontSize:16}}>Công ty tnhh một thành viên long thành hoặc một cái gì đấy tương tự nhưng bạn không biét</Text>
+                <Text style={{paddingVertical:5,fontSize:16}}>{detailPost.nameCompany}</Text>
             </View>
             <View style={{width:"100%",borderBottomWidth:1,borderBottomColor:"#80808024",marginVertical:7,paddingBottom:10}}>
                 <Text style={{fontWeight:"bold",fontSize:16}}>Mức Lương:</Text>
-                <Text style={{paddingVertical:5,fontSize:16}}>5.000.000 VND</Text>
+                <Text style={{paddingVertical:5,fontSize:16}}>{detailPost.wage}</Text>
             </View>
             <View style={{width:"100%",borderBottomWidth:1,borderBottomColor:"#80808024",marginVertical:7,paddingBottom:10}}>
                 <Text style={{fontWeight:"bold",fontSize:16}}>Nơi làm việc:</Text>
-                <Text style={{paddingVertical:5,fontSize:16}}>Hà Nội</Text>
+                <Text style={{paddingVertical:5,fontSize:16}}>{detailPost.address}</Text>
             </View>
             <View style={{width:"100%",borderBottomWidth:1,borderBottomColor:"#80808024",marginVertical:7,paddingBottom:10}}>
                 <Text style={{fontWeight:"bold",fontSize:16}}>Hạn tuyển:</Text>
-                <Text style={{paddingVertical:5,fontSize:16}}>16/10/2021</Text>
+                <Text style={{paddingVertical:5,fontSize:16}}>{detailPost.deadline}</Text>
             </View>
-            <View style={{width:"100%",borderBottomWidth:1,borderBottomColor:"#80808024",marginVertical:7,paddingBottom:10}}>
+            
+            <View style={{width:"80%",borderBottomWidth:1,borderBottomColor:"#80808024",marginVertical:7,paddingBottom:10,paddingRight:20}}>
                 <Text style={{fontWeight:"bold",fontSize:16}}>Yêu cầu:</Text>
-                <Text style={{paddingVertical:5,fontSize:16}}>Có hiểu biết tốt về những mẫu kiến trúc công nghệ và thiết kế công nghệ phổ biến
-Có kinh nghiệm thiết kế và triển khai kiến ​​trúc theo tiêu chuẩn của ngành và thông lệ tốt nhất của AWS
-Có kinh nghiệm chuyển dịch công việc từ mô hình lưu trữ tại chỗ lên đám mây là một lợi thế
-Có kinh nghiệm sử dụng phương pháp làm việc Agile và DevOps
-Có kinh nghiệm sử dụng dịch vụ AWS để phát triển microservice cho Website/Di động, cụ thể là: Dữ liệu và Phân tích, Thiết kế & quản lý API, Mạng lưới & Bảo mật, DevOps
-Có kinh nghiệm thiết kế và phát triển microservice trên Kubernetes và/hoặc Cloud và kinh nghiệm về mảng Tài chính/Ngân hàng là một lợi thế
-Có thể chỉnh sửa trực tiếp code hiện có để tích hợp phần mềm mới vào hệ thống hiện có</Text>
+                <View style={{width:"100%",paddingVertical:5,fontSize:16}}>
+                { <RenderHtml
+                contentWidth={widthContentHTML}
+                source={sourceReq}
+                /> }
+               
+                </View>
             </View>
             <View style={{width:"100%",borderBottomWidth:1,borderBottomColor:"#80808024",marginVertical:7,paddingBottom:10}}>
                 <Text style={{fontWeight:"bold",fontSize:16}}>Mô tả:</Text>
-                <Text style={{paddingVertical:5,fontSize:16}}>Tham gia vào quá trình thiết kế tổng thể Cơ sở Hạ tầng Đám mây và hệ thống DevOps
-Làm việc với người dùng từ đơn vị kinh doanh/nghiệp vụ và quản lý để đưa ra các giải pháp kỹ thuật; đánh giá rủi ro kỹ thuật và bảo mật và vạch ra chiến lược giảm thiểu thiệt hại
-Làm việc chặt chẽ với Kiến trúc sư doanh nghiệp để đáp ứng các tiêu chuẩn phát triển nội bộ
-Nghiên cứu, phân tích và đánh giá công nghệ & giải pháp để đáp ứng các yêu cầu kinh doanh
-Thiết kế quy trình phát triển và quy trình làm việc để hoạt động thống nhất với DevOps; thiết kế và tối ưu hóa ứng dụng và kiến ​​trúc cơ sở hạ tầng để đáp ứng các yêu cầu về chức năng, độ tin cậy và thời gian khả dụng
-Cung cấp kiến thức về các hệ thống liên quan đến sản phẩm Hành trình khách hàng và trực tiếp thay đổi mã nguồn, tích hợp các tính năng/mô-đun mới vào hệ thống hiện tại khi cần thiết
-Phối hợp với Chuyên viên phân tích nghiệp vụ, thực hiện k</Text>
+                <View style={{paddingVertical:5,fontSize:16}}>
+                { <RenderHtml
+                contentWidth={widthContentHTML}
+                source={sourceDes}
+                /> }
+                </View>
             </View>
          
         </View>

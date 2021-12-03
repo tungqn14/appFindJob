@@ -13,7 +13,7 @@ import {
   } from 'react-native';
   const width = Dimensions.get("window").width;
   const HEIGHT = Dimensions.get("window").height;
-export default function CustomInput({value,placeholder,setValue,secureTextEntry,icon,keyBoardText}) {
+export default function CustomInput({onChange,value,placeholder,setValue,secureTextEntry,icon,keyBoardText}) {
     
     return (
         <View style={styles.container}>
@@ -25,6 +25,7 @@ export default function CustomInput({value,placeholder,setValue,secureTextEntry,
                 onChangeText={setValue}
                 secureTextEntry={secureTextEntry}
                 keyboardType={keyBoardText}
+                onChange={onChange}
             />
         </View>
     )
