@@ -44,8 +44,6 @@ function DetailCompany({navigation,route}) {
         <ScrollView style={{flex:1}}>
          
  <View style={styles.container}>
- <View>
- </View>
             <View style={styles.topCompany}>
                 <ImageBackground source={require("../assets/images/bg.jpg")} style={{width:"100%",height:"100%"}} resizeMode="cover"/>
                 <View style={styles.wrapAvatar}>

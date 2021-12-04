@@ -22,9 +22,11 @@ import CompanyNavigation from './navigation/CompanyNavigation';
 const Tab = createBottomTabNavigator();
 
 const App = () => {
-  
+ // const Stack = createStackNavigation();
+
   return (
     <NavigationContainer>
+   
       <Tab.Navigator
             screenOptions={{
           backgroundColor: "#9AC4F8",

@@ -41,6 +41,11 @@ export default function Register({navigation}) {
                     <CustomInput keyBoardText="email-address" icon="envelope" value={email} setValue={setEmail} placeholder="Email"/>
                     <CustomInput keyBoardText="numeric" icon="phone" value={phone} setValue={setPhone} placeholder="Telephone"/>
                     <CustomInput icon="lock" secureTextEntry={true} value={password} setValue={setPassword} placeholder="Password"/>
+                    <CustomInput icon="location-arrow" value={userName} setValue={setUserName} placeholder="Địa chỉ "/>
+                    <CustomInput icon="atom" value={userName} setValue={setUserName} placeholder="Kĩ năng công nghệ "/>
+                    <CustomInput icon="money-bill-wave" value={userName} setValue={setUserName} placeholder="Tiền lương mong muốn"/>
+                    <CustomInput icon="id-card" value={userName} setValue={setUserName} placeholder="Chức vụ"/>
+                    <CustomInput numberOfLines={4} multiline  value={userName} setValue={setUserName} placeholder="Giới thiệu bản thân"/>
                     <CustomButton onPress={onRegisterPressed} text="Đăng Ký"/>
             </View>
             <View  style={styles.botBtn}>
@@ -60,13 +65,13 @@ const styles = StyleSheet.create({
   },
   topImage:{
         flex:1,
-        height:0.3*HEIGHT,
         alignItems:"center",
-        justifyContent:"center"
+        justifyContent:"center",
+        marginBottom:20,
   },
   midForm:{
     flex:1,
-    height:0.5*HEIGHT,
+  
     alignItems:"center",
     justifyContent:"center",
     width:"100%",
@@ -74,7 +79,8 @@ const styles = StyleSheet.create({
     },
   botBtn:{
     flex:1,
-    height:0.2*HEIGHT,
+    marginTop:30,
+  marginBottom:20,
     alignItems:"center",
     justifyContent:"center",
     flexDirection:"row",
