@@ -17,7 +17,6 @@ function ManageAccount({navigation}) {
   let user = {};
   AsyncStorage.getItem('user').then(res => {
     if (res) {
-      console.log(res);
       user = JSON.parse(res);
     }
   });
@@ -56,7 +55,9 @@ function ManageAccount({navigation}) {
           </View>
           <Icon name="chevron-right" style={{marginTop: 3}} size={15} />
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.itemAccount, {}]}>
+        <TouchableOpacity
+          style={[styles.itemAccount, {}]}
+          onPress={() => navigation.navigate('Favorite', user)}>
           <View style={{flexDirection: 'row'}}>
             <Icon name="heart" style={{marginTop: 3}} size={15} />
             <Text style={{fontSize: 16, marginLeft: 10}}>Yêu thích </Text>

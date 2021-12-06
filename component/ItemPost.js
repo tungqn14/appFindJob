@@ -1,5 +1,7 @@
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {formatMoney} from '../provider/Helper';
+
 import {
     Dimensions,
     Image,
@@ -14,17 +16,17 @@ import {
   } from 'react-native';
 
 export default function ItemPost({onPress,text,titlePost,address,wage}) {
-    
+
     return (
         <TouchableOpacity onPress={onPress} style={styles.blockPost}>
-          
+
           <View style={{width:"30%",height:99,backgroundColor:"green"}}>
             <Image
             style={styles.imagePost}
             resizeMode="cover"
             source={require('../assets/images/istockphoto.jpg')}
         />
-          </View> 
+          </View>
             <View style={styles.inforPost}>
                 <Text style={styles.titilePost} numberOfLines={2}>{titlePost}</Text>
                 <View >
@@ -36,16 +38,16 @@ export default function ItemPost({onPress,text,titlePost,address,wage}) {
                     <View style={{flexDirection:"row",width:"100%",paddingVertical:5}}>
                     <Icon style={{marginRight:5}} size={15} name="dollar"/>
                         <Text style={{color:"gray",fontSize:15,fontWeight:"600",textTransform:"capitalize"}}>Lương:</Text>
-                        <Text style={{color:"#e24c32",fontSize:15,marginLeft:5,textTransform:"capitalize"}}>{wage}</Text>
+                        <Text style={{color:"#e24c32",fontSize:15,marginLeft:5,textTransform:"capitalize"}}>{wage === 'Thỏa thuận' ? wage : formatMoney(wage)}</Text>
                     </View>
                 </View>
-            
+
             </View>
         </TouchableOpacity>
     )
 }
 const styles = StyleSheet.create({
-  
+
     blockPost:{
         width:"100%",
         flexDirection:"row",
@@ -66,7 +68,7 @@ const styles = StyleSheet.create({
        textTransform:"uppercase",
        marginVertical:5,
        flexShrink: 1
-      
+
     },
     imagePost:{
         width:"100%",

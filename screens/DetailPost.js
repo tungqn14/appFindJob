@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import BlockPost from '../component/BlockPost';
 import RenderHtml from 'react-native-render-html';
-import {getTypeRank, getScale, getTypeTime} from '../provider/Helper';
+import { getTypeRank, getScale, getTypeTime, formatMoney } from "../provider/Helper";
 import {
   Dimensions,
   Image,
@@ -16,6 +16,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -45,14 +46,16 @@ export default function DetailPost({route, navigation}) {
   });
   const {idPost} = route.params;
   const [detailPost, setDetailPost] = useState({});
-  const [skill, setSkill] = useState({});
-  const [welfare, setWelfare] = useState({});
+  const [skill, setSkill] = useState([]);
+  const [welfare, setWelfare] = useState([]);
+  const [careers, setCareers] = useState([]);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [cv, setCV] = useState('');
   const [namePDF, setNamePDF] = useState('Chọn file pdf');
   const [modalSelect, setModalSelect] = useState(false);
   const [modalApply, setModalApply] = useState(false);
+  const [modalNotify, setModalNotify] = useState(false);
 
   useEffect(() => {
     fetchDetailPost();
@@ -67,6 +70,7 @@ export default function DetailPost({route, navigation}) {
         setDetailPost(result.data.listPost);
         setSkill(result.data.skills);
         setWelfare(result.data.welfares);
+        setCareers(result.data.careers);
       })
       .catch(err => console.log(err));
   };
@@ -77,7 +81,6 @@ export default function DetailPost({route, navigation}) {
     html: `<div style='width:100%;'>${detailPost.reqPost}</div>`,
   };
   const savePost = () => {
-    console.log(idPost, user.auth_token);
     axios
       .post('https://tungfindjob.herokuapp.com/api/save-post', {
         idPost: idPost,
@@ -85,15 +88,10 @@ export default function DetailPost({route, navigation}) {
       })
       .then(function (response) {
         let res = response && response.data;
-        console.log(res);
-        if (res.success) {
-          console.log(res);
-        } else {
-          console.warn(res.message);
-        }
+        Alert.alert('Thông báo', res.message);
       })
       .catch(function (error) {
-        console.log('lỗi : ' + error);
+        console.error('lỗi : ' + error);
       });
   };
   const choosePDF = () => {
@@ -121,10 +119,16 @@ export default function DetailPost({route, navigation}) {
     });
   };
   const checkCV = () => {
-    if (user.cv && user.fullName && user.phone) {
-      setModalSelect(true);
+    // check isLogin
+    if (user && user.auth_token) {
+      if (user.cv && user.fullName && user.phone) {
+        setModalSelect(true);
+      } else {
+        setModalApply(true);
+      }
     } else {
-      setModalApply(true);
+      // show model thông báo cần đăng nhập
+      setModalNotify(true);
     }
   };
   const applyPost = (cv, name, phone) => {
@@ -164,6 +168,37 @@ export default function DetailPost({route, navigation}) {
         });
     }
   };
+  let objSkill = {};
+  skill &&
+    skill.forEach(item => {
+      objSkill[item.id] = item;
+    });
+  let techs =
+    (detailPost && detailPost.tech_id && JSON.parse(detailPost.tech_id)) || [];
+  let tech = '';
+  techs.forEach(item => {
+    if (objSkill[item]) {
+      tech += objSkill[item].nameSkill + ' , ';
+    }
+  });
+
+  let objWelfare = {};
+  welfare &&
+    welfare.forEach(item => {
+      objWelfare[item.id] = item;
+    });
+  let welfares =
+    (detailPost &&
+      detailPost.welfare_id &&
+      JSON.parse(detailPost.welfare_id)) ||
+    [];
+  let welfareLable = '';
+  welfares.forEach(item => {
+    if (objWelfare[item]) {
+      welfareLable += objWelfare[item].name_welfare + ' , ';
+    }
+  });
+
   return (
     <ScrollView style={{flex: 1, height: '100%'}}>
       <View style={styles.container}>
@@ -192,7 +227,7 @@ export default function DetailPost({route, navigation}) {
             }}>
             <Text style={{fontWeight: 'bold', fontSize: 16}}>Mức Lương:</Text>
             <Text style={{paddingVertical: 5, fontSize: 16}}>
-              {detailPost.wage}
+              {detailPost.wage === 'Thỏa thuận' ? detailPost.wage : formatMoney(detailPost.wage)}
             </Text>
           </View>
           <View
@@ -223,7 +258,30 @@ export default function DetailPost({route, navigation}) {
               {detailPost.deadline}
             </Text>
           </View>
-
+          <View
+            style={{
+              width: '100%',
+              borderBottomWidth: 1,
+              borderBottomColor: '#80808024',
+              marginVertical: 7,
+              paddingBottom: 10,
+            }}>
+            <Text style={{fontWeight: 'bold', fontSize: 16}}>Công nghệ:</Text>
+            <Text style={{paddingVertical: 5, fontSize: 16}}>{tech}</Text>
+          </View>
+          <View
+            style={{
+              width: '100%',
+              borderBottomWidth: 1,
+              borderBottomColor: '#80808024',
+              marginVertical: 7,
+              paddingBottom: 10,
+            }}>
+            <Text style={{fontWeight: 'bold', fontSize: 16}}>Phúc lợi:</Text>
+            <Text style={{paddingVertical: 5, fontSize: 16}}>
+              {welfareLable}
+            </Text>
+          </View>
           <View
             style={{
               width: '80%',
@@ -287,6 +345,30 @@ export default function DetailPost({route, navigation}) {
             </Text>
           </TouchableOpacity>
         </View>
+        <Modal animationType="slide" transparent={true} visible={modalNotify}>
+          <View style={styles.modal}>
+            <View style={styles.modal_confirm}>
+              <View style={styles.v_row_between_modal}>
+                <Text style={styles.title}>Thông báo</Text>
+                <Text onPress={() => setModalNotify(false)}>Hủy</Text>
+              </View>
+              <View style={styles.modal_container}>
+                <Text>
+                  Bạn chưa đăng nhập, vui lòng đăng nhập để sử dụng tính năng
+                  này
+                </Text>
+              </View>
+              <View style={styles.v_row_end}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('AccountNavigation')}>
+                  <View style={styles.box_style}>
+                    <Text>Đăng nhập</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
         <Modal animationType="slide" transparent={true} visible={modalSelect}>
           <View style={styles.modal}>
             <View style={styles.modal_confirm}>

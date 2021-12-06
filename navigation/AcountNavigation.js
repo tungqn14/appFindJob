@@ -4,6 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Login from '../screens/Login';
 import Register from '../screens/Register';
 import Account from '../screens/Account';
+import Favorite from '../screens/Favorite';
 import ManageAccount from '../screens/ManageAccount';
 import UpdateAcount from '../screens/UpdateAcount';
 
@@ -44,6 +45,14 @@ export default function AccountNavigation() {
         options={{
           headerTitleAlign: 'center',
           title: 'Tài khoản',
+        }}
+      />
+      <Stack.Screen
+        name="Favorite"
+        component={Favorite}
+        options={{
+          headerTitleAlign: 'center',
+          title: 'Yêu thích',
         }}
       />
       <Stack.Screen

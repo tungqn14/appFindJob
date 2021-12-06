@@ -1,88 +1,69 @@
-import React from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import React, {useState, useEffect} from 'react';
+import {ScrollView, StyleSheet, View, Text, Image} from 'react-native';
 import BlockPost from '../component/BlockPost';
-import {
-    Dimensions,
-    Image,
-    ImageBackground,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
-  } from 'react-native';
+import SearchBar from '../component/SearchBar';
+import {getTypeRank, getScale, getTypeTime} from '../provider/Helper';
+import ItemPost from '../component/ItemPost';
+import axios from 'axios';
+export default function Favorite({navigation, route}) {
+  const user = route.params;
+  const [dataListPost, setDataListPost] = useState([]);
+  useEffect(() => {
+    fetchDataPost();
+  }, [dataListPost]);
 
-function Favorite({onPress,text,titlePost,address,wage}) {
+  const fetchDataPost = async () => {
+    axios
+      .get(
+        'https://tungfindjob.herokuapp.com/api/list-save-post?token=' +
+          user.auth_token,
+      )
+      .then(function (response) {
+        let res = response && response.data;
+        if (res.status === 200) {
+          setDataListPost(res.data.data);
+        } else {
+          console.warn(res.message);
+        }
+      })
+      .catch(function (error) {
+        console.log('lỗi : ' + error);
+      });
+  };
 
-    return (
-        <ScrollView style={{flex:1,height:"100%"}}>
-            <View style={styles.container}>
-                <Text>Hello favourite</Text>
-            
-            </View>
-        </ScrollView>
-       
-    )
+  return (
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      style={styles.container}>
+      <Text
+        style={{
+          textAlign: 'center',
+          marginVertical: 20,
+          fontSize: 22,
+          fontWeight: 'bold',
+        }}>
+        Danh sách bài tuyển dụng
+      </Text>
+      {dataListPost.map((item, index) => (
+        <ItemPost
+          key={index}
+          onPress={() => null}
+          titlePost={item.titlePost}
+          address={item.users.company.location.name}
+          wage={item.wage}
+        />
+      ))}
+    </ScrollView>
+  );
 }
 const styles = StyleSheet.create({
-  
-   container:{
-    flex:1,
-    height:"100%",
-    justifyContent:"space-between",
-   // backgroundColor:"#9e9e9e29",
-   flexWrap:"wrap",
-    flexDirection:"column",
-   },
-   topDetailPost:{
-        borderTopColor:"gray",
-        padding:15,
-        height:"70%",
-        width:"100%",
-      
-        flexBasis:"70%",
-   },
-   btnApply:{
-        borderColor:"gray",
-        borderWidth:1,
-        width:150,
-        padding: 10,
-        alignItems:"center",
-        borderRadius:5,
-        marginHorizontal:5,
-        
-   },
-    botDetailPost:{
-        padding:15,
-        flexDirection:"row",
-        height:"25%",
-        width:"100%",
-        flexBasis:"25%",
-       
-    },
-    titleDetailPost:{
-        fontSize:18,
-        fontWeight:"bold"
-    },
-    // inforDetail:{
-    //     shadowOffset:{  width: 10,  height: 10,  },
-    //     shadowColor: 'black',
-    //     shadowOpacity: 1.0,
-    //     borderWidth:1,
-    //     backgroundColor:"white",
-    //     borderColor:"gray"
-    // },
-    // wrapLine:{
-    //    paddingHorizontal:10,
-    //     width:"100%",
-    //     marginVertical:10,
-    //     borderBottomWidth:1,
-    //     paddingBottom:10,
-    //     borderColor:"#80808024",
-    //     marginBottom:10
-    // }
-    });
-export default Favorite;
+  container: {
+    paddingHorizontal: 20,
+  },
+  listPostVip: {},
+  titleListPost: {
+    fontWeight: 'bold',
+    fontSize: 20,
+    marginVertical: 15,
+  },
+});
