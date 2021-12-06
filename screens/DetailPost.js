@@ -81,18 +81,23 @@ export default function DetailPost({route, navigation}) {
     html: `<div style='width:100%;'>${detailPost.reqPost}</div>`,
   };
   const savePost = () => {
-    axios
-      .post('https://tungfindjob.herokuapp.com/api/save-post', {
-        idPost: idPost,
-        token: user.auth_token,
-      })
-      .then(function (response) {
-        let res = response && response.data;
-        Alert.alert('Thông báo', res.message);
-      })
-      .catch(function (error) {
-        console.error('lỗi : ' + error);
-      });
+    if (user && user.auth_token) {
+      axios
+        .post('https://tungfindjob.herokuapp.com/api/save-post', {
+          idPost: idPost,
+          token: user.auth_token,
+        })
+        .then(function (response) {
+          let res = response && response.data;
+          Alert.alert('Thông báo', res.message);
+        })
+        .catch(function (error) {
+          console.error('lỗi : ' + error);
+        });
+    } else {
+      // show model thông báo cần đăng nhập
+      setModalNotify(true);
+    }
   };
   const choosePDF = () => {
     DocumentPicker.pick({
