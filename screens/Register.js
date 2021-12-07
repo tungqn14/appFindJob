@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {
+  Alert,
   Dimensions,
   Image,
   Linking,
@@ -56,11 +57,14 @@ export default function Register({navigation}) {
             AsyncStorage.setItem('user', JSON.stringify(res.data));
             navigation.navigate('ManageAccount');
           } else {
-            console.warn(res.message);
+            Alert.alert('Thông báo', res.message);
           }
         })
         .catch(function (error) {
-          console.warn('lỗi : ' + error);
+          Alert.alert(
+            'Thông báo',
+            'Có lỗi sảy ra vui lòng liên hệ quản trị viên',
+          );
         });
     }
   };

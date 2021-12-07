@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Alert
 } from 'react-native';
 import CustomInput from '../component/CustomInput';
 import CustomButton from '../component/CustomButton';
@@ -32,7 +33,7 @@ export default function Login({navigation}) {
   const [errPassword, setErrPassword] = useState('');
   const loginApp = () => {
     if (email == '' && password == '') {
-      alert('Email hoặc mật khẩu không được để trống !!');
+      Alert.alert('Thông báo', 'Email hoặc mật khẩu không được để trống !!');
     } else {
       axios
         .post('https://tungfindjob.herokuapp.com/api/login', {
@@ -45,11 +46,11 @@ export default function Login({navigation}) {
             AsyncStorage.setItem('user', JSON.stringify(res.data));
             navigation.navigate('ManageAccount');
           } else {
-            console.warn(res.message);
+            Alert.alert('Thông báo', res.message);
           }
         })
         .catch(function (error) {
-          console.log('lỗi : ' + error);
+          Alert.alert('Thông báo', 'Có lỗi sảy ra vui lòng liên hệ quản trị viên');
         });
     }
   };
