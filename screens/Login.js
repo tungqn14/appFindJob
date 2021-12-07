@@ -46,7 +46,7 @@ export default function Login({navigation}) {
             AsyncStorage.setItem('user', JSON.stringify(res.data));
             navigation.navigate('ManageAccount');
           } else {
-            Alert.alert('Thông báo', res.message);
+            Alert.alert('Thông báo', res.data);
           }
         })
         .catch(function (error) {
