@@ -166,7 +166,7 @@ export default function DetailPost({route, navigation}) {
             setModalSelect(false);
             alert('Ứng tuyền thành công');
           } else {
-            console.warn(res.message);
+            alert(res.message);
           }
         })
         .catch(function (error) {
