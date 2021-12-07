@@ -15,12 +15,12 @@ export default function ListCompany({navigation}) {
     fetchDataCompany();
   }, [dataListCompany]);
   const fetchDataCompany = async () => {
-    const response = await fetch(
-      'https://tungfindjob.herokuapp.com/api/list-company',
-    )
+    await fetch('https://tungfindjob.herokuapp.com/api/list-company')
       .then(res => res.json())
       .then(result => {
-        setDataListCompany(result.data.data);
+        setDataListCompany(
+          result.data.listCompany && result.data.listCompany.data,
+        );
       })
       .catch(err => console.log(err));
   };
