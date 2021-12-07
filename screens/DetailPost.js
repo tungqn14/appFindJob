@@ -155,7 +155,7 @@ export default function DetailPost({route, navigation}) {
           cvSubmit: cv,
           nameSubmit: name,
           phoneSubmit: phone,
-          idPost: idPost,
+          postId: idPost,
           emailSubmit: user.email,
           token: user.auth_token,
         })
