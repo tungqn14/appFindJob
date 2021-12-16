@@ -2,7 +2,14 @@ import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import BlockPost from '../component/BlockPost';
 import RenderHtml from 'react-native-render-html';
-import { getTypeRank, getScale, getTypeTime, formatMoney } from "../provider/Helper";
+import { server } from "../config";
+
+import {
+  getTypeRank,
+  getScale,
+  getTypeTime,
+  formatMoney,
+} from '../provider/Helper';
 import {
   Dimensions,
   Image,
@@ -17,8 +24,8 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  FlatList,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 const widthContentHTML = Dimensions.get('screen').width;
 import CustomInput from '../component/CustomInput';
@@ -37,13 +44,9 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 const storage = getStorage(firebaseApp);
 
-export default function DetailPost({route, navigation}) {
-  var user = {};
-  AsyncStorage.getItem('user').then(res => {
-    if (res) {
-      user = JSON.parse(res);
-    }
-  });
+import {connect} from 'react-redux';
+
+function DetailPost({route, navigation, user}) {
   const {idPost} = route.params;
   const [detailPost, setDetailPost] = useState({});
   const [skill, setSkill] = useState([]);
@@ -56,15 +59,17 @@ export default function DetailPost({route, navigation}) {
   const [modalSelect, setModalSelect] = useState(false);
   const [modalApply, setModalApply] = useState(false);
   const [modalNotify, setModalNotify] = useState(false);
+  const [isSave, setIsSave] = useState(false);
 
   useEffect(() => {
     fetchDetailPost();
-  }, [detailPost]);
+  }, []);
+  useEffect(() => {
+    checkSave();
+  }, []);
 
   const fetchDetailPost = async () => {
-    const response = await fetch(
-      `https://tungfindjob.herokuapp.com/api/detail-post-${idPost}`,
-    )
+    await fetch(`${server}/detail-post-${idPost}`)
       .then(res => res.json())
       .then(result => {
         setDetailPost(result.data.listPost);
@@ -73,6 +78,24 @@ export default function DetailPost({route, navigation}) {
         setCareers(result.data.careers);
       })
       .catch(err => console.log(err));
+  };
+
+  const checkSave = async () => {
+    if (user && user.auth_token) {
+      axios
+        .post(server + '/check-save-post', {
+          postId: idPost,
+          token: user.auth_token,
+        })
+        .then(function (response) {
+          let res = response && response.data;
+          setIsSave(res.code);
+        })
+        .catch(function (error) {
+          console.error('lỗi : ' + error);
+        });
+    } else {
+    }
   };
   const sourceDes = {
     html: `<div style='width:100%;'>${detailPost.desPost}</div>`,
@@ -83,12 +106,13 @@ export default function DetailPost({route, navigation}) {
   const savePost = () => {
     if (user && user.auth_token) {
       axios
-        .post('https://tungfindjob.herokuapp.com/api/save-post', {
+        .post(server + '/save-post', {
           idPost: idPost,
           token: user.auth_token,
         })
         .then(function (response) {
           let res = response && response.data;
+          setIsSave(res.code === 1);
           Alert.alert('Thông báo', res.message);
         })
         .catch(function (error) {
@@ -151,7 +175,7 @@ export default function DetailPost({route, navigation}) {
     FunCheck(cv === '', 'Vui lòng chọn file CV');
     if (!isError) {
       axios
-        .post('https://tungfindjob.herokuapp.com/api/apply-post', {
+        .post(server + '/apply-post', {
           cvSubmit: cv,
           nameSubmit: name,
           phoneSubmit: phone,
@@ -233,7 +257,9 @@ export default function DetailPost({route, navigation}) {
             }}>
             <Text style={{fontWeight: 'bold', fontSize: 16}}>Mức Lương:</Text>
             <Text style={{paddingVertical: 5, fontSize: 16}}>
-              {detailPost.wage === 'Thỏa thuận' ? detailPost.wage : formatMoney(detailPost.wage)}
+              {detailPost.wage === 'Thỏa thuận'
+                ? detailPost.wage
+                : formatMoney(detailPost.wage)}
             </Text>
           </View>
           <View
@@ -335,7 +361,7 @@ export default function DetailPost({route, navigation}) {
             ]}>
             <Text
               style={{color: 'blue', fontSize: 15, textTransform: 'uppercase'}}>
-              Lưu
+              {isSave ? 'Hủy' : 'Lưu'}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -366,10 +392,19 @@ export default function DetailPost({route, navigation}) {
               </View>
               <View style={styles.v_row_end}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate('AccountNavigation')}>
-                  <View style={styles.box_style}>
-                    <Text>Đăng nhập</Text>
-                  </View>
+                  onPress={() => navigation.navigate('AccountNavigation')}
+                  style={[
+                    styles.btnApply,
+                    {backgroundColor: 'white', borderColor: 'blue', width: 110},
+                  ]}>
+                  <Text
+                    style={{
+                      color: 'blue',
+                      fontSize: 15,
+                      textTransform: 'uppercase',
+                    }}>
+                    Đăng nhập
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -387,29 +422,53 @@ export default function DetailPost({route, navigation}) {
               </View>
               <View style={styles.v_row_end}>
                 <TouchableOpacity
-                  style={{marginRight: 10}}
-                  onPress={() => setModalApply(true)}>
-                  <View style={styles.box_style}>
-                    <Text>CV mới</Text>
-                  </View>
+                  onPress={() => setModalApply(true)}
+                  style={[
+                    styles.btnApply,
+                    {backgroundColor: '#e24c32', width: 110},
+                  ]}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontSize: 15,
+                      textTransform: 'uppercase',
+                    }}>
+                    CV mới
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => applyPost(user.cv, user.fullName, user.phone)}>
-                  <View style={styles.box_style}>
-                    <Text>Đồng ý</Text>
-                  </View>
+                  onPress={() => applyPost(user.cv, user.fullName, user.phone)}
+                  style={[
+                    styles.btnApply,
+                    {backgroundColor: '#e24c32', width: 110},
+                  ]}>
+                  <Text
+                    style={{
+                      color: 'white',
+                      fontSize: 15,
+                      textTransform: 'uppercase',
+                    }}>
+                    Đồng ý
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
         </Modal>
         <Modal animationType="slide" transparent={true} visible={modalApply}>
-          <View style={styles.modal}>
-            <View style={styles.modal_confirm}>
-              <View style={styles.v_row_between_modal}>
-                <Text style={styles.title}>Thông báo</Text>
+          <View style={styles.model_container}>
+            <View style={styles.model_style}>
+              <View style={styles.v_row_between}>
+                <Text style={styles.title}>Thông tin cá nhân</Text>
+                <TouchableOpacity onPress={() => setModalApply(false)}>
+                  {/*<Image*/}
+                  {/*  source={require('../assets/close.png')}*/}
+                  {/*  style={styles.icon}*/}
+                  {/*/>*/}
+                  <Text>Hủy</Text>
+                </TouchableOpacity>
               </View>
-              <View style={styles.modal_container}>
+              <View style={styles.model_contain}>
                 <CustomInput
                   icon="user"
                   value={name}
@@ -438,18 +497,11 @@ export default function DetailPost({route, navigation}) {
                   <Text>CV</Text>
                   <Text>{namePDF}</Text>
                 </TouchableOpacity>
-              </View>
-              <View style={styles.v_row_end}>
-                <TouchableOpacity
-                  style={{marginRight: 10}}
-                  onPress={() => setModalApply(false)}>
-                  <View style={styles.box_style}>
-                    <Text>Hủy</Text>
-                  </View>
-                </TouchableOpacity>
                 <TouchableOpacity onPress={() => applyPost(cv, name, phone)}>
                   <View style={styles.box_style}>
-                    <Text>Xong</Text>
+                    <Text style={{color: '#fff', fontWeight: 'bold'}}>
+                      Ứng tuyển
+                    </Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -477,34 +529,63 @@ const styles = StyleSheet.create({
 
     flexBasis: '70%',
   },
+  model_container: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  model_contain: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: '#fff',
+  },
+  v_row_between: {
+    paddingVertical: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+  },
+  model_style: {
+    width: widthContentHTML,
+    padding: 10,
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    height: '50%',
+    backgroundColor: '#fff',
+  },
   modal: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   v_row_between_modal: {
-    paddingVertical: 5,
+    paddingVertical: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 10,
+    borderTopRightRadius: 10,
+    borderTopLeftRadius: 10,
     backgroundColor: '#5cd5c5',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#000',
   },
   modal_container: {
     padding: 10,
-    backgroundColor: '#3C5A5C',
+    backgroundColor: '#fff',
   },
   v_row_end: {
     padding: 5,
+    paddingVertical: 10,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center',
-    backgroundColor: '#3C5A5C',
+    borderBottomRightRadius: 10,
+    borderBottomLeftRadius: 10,
+    backgroundColor: '#fff',
   },
   box_style: {
     backgroundColor: '#5cd5c5',
@@ -541,7 +622,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   modal_confirm: {
-    width: '80%',
+    width: '85%',
   },
   // inforDetail:{
   //     shadowOffset:{  width: 10,  height: 10,  },
@@ -561,3 +642,9 @@ const styles = StyleSheet.create({
   //     marginBottom:10
   // }
 });
+function mapState(state) {
+  return {
+    user: state.Home.user,
+  };
+}
+export default connect(mapState)(DetailPost);

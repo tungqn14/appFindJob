@@ -3,7 +3,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import BlockPost from '../component/BlockPost';
 import ItemPost from '../component/ItemPost';
 import RenderHtml from 'react-native-render-html';
-import {getTypeRank, getScale, getTypeTime, formatMoney} from '../provider/Helper';
+import {
+  getTypeRank,
+  getScale,
+  getTypeTime,
+  formatMoney,
+} from '../provider/Helper';
 import {
   Dimensions,
   Image,
@@ -18,6 +23,8 @@ import {
   View,
 } from 'react-native';
 const widthContentHTML = Dimensions.get('screen').width;
+import {server} from '../config';
+
 function DetailCompany({navigation, route}) {
   const {idCompany, address, street, phone} = route.params;
   const [detailCompany, setDetailCompany] = useState({});
@@ -32,9 +39,7 @@ function DetailCompany({navigation, route}) {
   }, []);
 
   const fetchDetailCompany = async () => {
-    await fetch(
-      `https://tungfindjob.herokuapp.com/api/detail-company-${idCompany}`,
-    )
+    await fetch(`${server}/detail-company-${idCompany}`)
       .then(res => res.json())
       .then(result => {
         setDetailCompany(result.data);
@@ -90,7 +95,11 @@ function DetailCompany({navigation, route}) {
             <Image
               style={styles.imageAvatar}
               resizeMode="cover"
-              source={require('../assets/images/istockphoto.jpg')}
+              source={
+                company.logo
+                  ? {uri: company.logo}
+                  : require('../assets/images/istockphoto.jpg')
+              }
             />
           </View>
           <Text style={styles.nameCompany}>{company.nameCompany}</Text>
@@ -291,6 +300,7 @@ function DetailCompany({navigation, route}) {
                   }}
                   titlePost={item.titlePost}
                   address={company && company.location.name}
+                  logo={company && company.logo}
                   wage={item.wage}
                 />
               ))}

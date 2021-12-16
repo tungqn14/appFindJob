@@ -1,11 +1,8 @@
 import React from 'react';
 import Home from '../screens/Home';
-import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import DetailCompany from '../screens/DetailCompany';
 import DetailPost from '../screens/DetailPost';
-import ManageAccount from '../screens/ManageAccount';
-import Account from '../screens/Account';
 const Stack = createNativeStackNavigator();
 
 function HomeNavigation() {

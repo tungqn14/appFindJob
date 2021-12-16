@@ -1,14 +1,11 @@
 import React, {useState} from 'react';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import {
   Alert,
   Dimensions,
   Image,
   Linking,
   Pressable,
-  SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View,
@@ -16,12 +13,13 @@ import {
 import CustomInput from '../component/CustomInput';
 import CustomButton from '../component/CustomButton';
 import Logo from '../component/Logo';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 const axios = require('axios');
 const width = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
+import {connect} from 'react-redux';
+import {server} from "../config";
 
-export default function Register({navigation}) {
+function Register({navigation, dispatch}) {
   const [email, setEmail] = useState('');
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
@@ -45,7 +43,7 @@ export default function Register({navigation}) {
     FunCheck(password === '', 'Vui lòng nhập mật khẩu');
     if (!isError) {
       axios
-        .post('https://tungfindjob.herokuapp.com/api/register', {
+        .post(server + '/register', {
           email: email,
           phone: phone,
           fullName: userName,
@@ -54,7 +52,7 @@ export default function Register({navigation}) {
         .then(function (response) {
           let res = response && response.data;
           if (res.success) {
-            AsyncStorage.setItem('user', JSON.stringify(res.data));
+            dispatch({type: 'update_user', data: res.data});
             navigation.navigate('ManageAccount');
           } else {
             Alert.alert('Thông báo', res.message);
@@ -147,3 +145,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+export default connect()(Register);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from "react";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {
   ScrollView,
@@ -11,24 +11,20 @@ import {
   Linking,
 } from 'react-native';
 import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {connect} from 'react-redux';
+import { server } from "../config";
 
-function ManageAccount({navigation}) {
-  let user = {};
-  AsyncStorage.getItem('user').then(res => {
-    if (res) {
-      user = JSON.parse(res);
-    }
-  });
+function ManageAccount({navigation, user, dispatch}) {
+  const [notifications, setNotifications] = useState([]);
   const logout = () => {
     axios
-      .post('https://tungfindjob.herokuapp.com/api/logout', {
+      .post(server + '/logout', {
         token: user.auth_token,
       })
       .then(function (response) {
         let res = response && response.data;
         if (res.status === 200) {
-          AsyncStorage.clear();
+          dispatch({type: 'update_user', data: {}});
           navigation.navigate('Login');
         } else {
           console.warn(res.message);
@@ -36,6 +32,25 @@ function ManageAccount({navigation}) {
       })
       .catch(function (error) {
         console.warn('lỗi : ' + error);
+      });
+  };
+  useEffect(() => {
+    fetch();
+  }, []);
+
+  const fetch = async () => {
+    axios
+      .post(server + '/get-data-notification', {
+        token: user.auth_token,
+      })
+      .then(function (response) {
+        let res = response && response.data;
+        if (res.status === 200) {
+          setNotifications(res.data);
+        }
+      })
+      .catch(function (error) {
+        console.error('lỗi : ' + error);
       });
   };
   return (
@@ -64,6 +79,20 @@ function ManageAccount({navigation}) {
           </View>
           <Icon name="chevron-right" style={{marginTop: 3}} size={15} />
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.itemAccount, {}]}
+          onPress={() => navigation.navigate('Notification', notifications)}>
+          <View style={{flexDirection: 'row'}}>
+            <Icon name="bell" style={{marginTop: 3}} size={15} />
+            <Text style={{fontSize: 16, marginLeft: 10}}>Thông báo </Text>
+          </View>
+          <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            <View style={{marginRight: 20, backgroundColor: 'red', paddingHorizontal: 5, borderRadius: 10}}>
+              <Text style={{color: 'white'}}>{notifications.length}</Text>
+            </View>
+            <Icon name="chevron-right" style={{marginTop: 3}} size={15} />
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity style={[styles.itemAccount, {}]} onPress={logout}>
           <View style={{flexDirection: 'row'}}>
             <Icon name="sign-out-alt" style={{marginTop: 3}} size={15} />
@@ -84,4 +113,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 });
-export default ManageAccount;
+function mapState(state) {
+  return {
+    user: state.Home.user,
+  };
+}
+export default connect(mapState)(ManageAccount);

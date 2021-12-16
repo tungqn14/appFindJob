@@ -10,30 +10,28 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
-  Linking
+  Linking,
 } from 'react-native';
+import {connect} from 'react-redux';
 
 class Account extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       img: require('../assets/images/avatar.png'),
-      user: {},
     };
   }
   componentDidMount() {
-    AsyncStorage.getItem('user').then(res => {
-      let user = JSON.parse(res);
-      let img = user.avatar
-        ? {uri: user.avatar}
-        : require('../assets/images/avatar.png');
-      this.setState({user: user, img: img});
-    });
+    let user = this.props.user;
+    let img = user.avatar
+      ? {uri: user.avatar}
+      : require('../assets/images/avatar.png');
+    this.setState({img: img});
   }
 
   render() {
-    const {img, user} = this.state;
-    const {navigation} = this.props;
+    const {img} = this.state;
+    const {navigation, user} = this.props;
     return (
       <View style={styles.container}>
         <ScrollView style={{flex: 1}}>
@@ -299,4 +297,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
-export default Account;
+function mapState(state) {
+  return {
+    user: state.Home.user,
+  };
+}
+export default connect(mapState)(Account);

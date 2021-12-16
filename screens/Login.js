@@ -12,7 +12,7 @@ import {
   StyleSheet,
   Text,
   View,
-  Alert
+  Alert,
 } from 'react-native';
 import CustomInput from '../component/CustomInput';
 import CustomButton from '../component/CustomButton';
@@ -21,12 +21,15 @@ import Logo from '../component/Logo';
 const WIDTH = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
 const baseURL = 'http://192.168.1.9:80/api/home';
-export default function Login({navigation}) {
-  AsyncStorage.getItem('user').then(res => {
-    if (res) {
+import {connect} from 'react-redux';
+import {server} from "../config";
+
+function Login({navigation, user, dispatch}) {
+  useEffect(() => {
+    if (user && user.id) {
       navigation.navigate('ManageAccount');
     }
-  });
+  }, []);
   const [email, setEmail] = useState('');
   const [errEmail, setErrEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,31 +39,30 @@ export default function Login({navigation}) {
       Alert.alert('Thông báo', 'Email hoặc mật khẩu không được để trống !!');
     } else {
       axios
-        .post('https://tungfindjob.herokuapp.com/api/login', {
+        .post(server + '/login', {
           email: email,
           password: password,
         })
         .then(function (response) {
           let res = response && response.data;
           if (res.success) {
-            AsyncStorage.setItem('user', JSON.stringify(res.data));
+            dispatch({type: 'update_user', data: res.data});
             navigation.navigate('ManageAccount');
           } else {
             Alert.alert('Thông báo', res.data);
           }
         })
         .catch(function (error) {
-          Alert.alert('Thông báo', 'Có lỗi sảy ra vui lòng liên hệ quản trị viên');
+          Alert.alert(
+            'Thông báo',
+            'Có lỗi sảy ra vui lòng liên hệ quản trị viên',
+          );
         });
     }
   };
   const onFormRegister = () => {
     navigation.navigate('Register');
   };
-  // useEffect(() => {
-  //   const res = await fetch("")
-
-  // }, [])
   return (
     <ScrollView showsHorizontalScrollIndicator={false}>
       <View style={styles.container}>
@@ -133,3 +135,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+function mapState(state) {
+  return {
+    user: state.Home.user,
+  };
+}
+export default connect(mapState)(Login);

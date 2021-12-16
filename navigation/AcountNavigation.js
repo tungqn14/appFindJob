@@ -7,6 +7,8 @@ import Account from '../screens/Account';
 import Favorite from '../screens/Favorite';
 import ManageAccount from '../screens/ManageAccount';
 import UpdateAcount from '../screens/UpdateAcount';
+import notifications from '../screens/notifications';
+import notification from '../screens/notification';
 
 export default function AccountNavigation() {
   const Stack = createNativeStackNavigator();
@@ -61,6 +63,22 @@ export default function AccountNavigation() {
         options={{
           headerTitleAlign: 'center',
           title: 'Cập nhật',
+        }}
+      />
+      <Stack.Screen
+        name="Notification"
+        component={notifications}
+        options={{
+          headerTitleAlign: 'center',
+          title: 'Thông báo',
+        }}
+      />
+      <Stack.Screen
+        name="detailNotification"
+        component={notification}
+        options={{
+          headerTitleAlign: 'center',
+          title: 'Chi tiết thông báo',
         }}
       />
     </Stack.Navigator>

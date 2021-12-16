@@ -15,8 +15,6 @@ import {
 } from 'react-native';
 import CustomInput from '../component/CustomInput';
 import CustomButton from '../component/CustomButton';
-import Logo from '../component/Logo';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import {getDownloadURL, getStorage, ref, uploadBytes} from 'firebase/storage';
 import DocumentPicker from 'react-native-document-picker';
@@ -36,8 +34,10 @@ const storage = getStorage(firebaseApp);
 const axios = require('axios');
 const width = Dimensions.get('window').width;
 const HEIGHT = Dimensions.get('window').height;
+import {connect} from 'react-redux';
+import {server} from '../config';
 
-export default function UpdateAcount({navigation, route}) {
+function UpdateAcount({navigation, route, dispatch}) {
   const user = route.params;
   const [avatarShow, setAvatarShow] = useState(
     (user && user.avatar) ||
@@ -61,9 +61,7 @@ export default function UpdateAcount({navigation, route}) {
   const onFormLogin = () => {
     navigation.navigate('Login');
   };
-  const validate = () => {
-
-  };
+  const validate = () => {};
   const chooseImg = () => {
     ImagePicker.openPicker({
       width: 300,
@@ -147,14 +145,14 @@ export default function UpdateAcount({navigation, route}) {
         token: user.auth_token,
       };
       axios
-        .post('https://tungfindjob.herokuapp.com/api/update-user', data)
+        .post(server + '/update-user', data)
         .then(function (response) {
           let res = response && response.data;
           if (res.status === 200) {
             data.auth_token = data.token;
             data.id = user.id;
-            AsyncStorage.setItem('user', JSON.stringify(data));
-            navigation.navigate('ManageAccount');
+            dispatch({type: 'update_user', data: data});
+            navigation.navigate('Account');
           } else {
             console.warn(res.message);
           }
@@ -292,3 +290,4 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
+export default connect()(UpdateAcount);
