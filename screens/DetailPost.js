@@ -430,8 +430,8 @@ function DetailPost({route, navigation, user}) {
               <View style={styles.v_row_end}>
                 <TouchableOpacity
                   onPress={() => {
-                    setModalSelect(false)
-                    setModalApply(true)
+                    setModalSelect(false);
+                    setModalApply(true);
                   }}
                   style={[
                     styles.btnApply,
