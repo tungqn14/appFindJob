@@ -9,6 +9,7 @@ import ManageAccount from '../screens/ManageAccount';
 import UpdateAcount from '../screens/UpdateAcount';
 import notifications from '../screens/notifications';
 import notification from '../screens/notification';
+import DetailPost from '../screens/DetailPost';
 
 export default function AccountNavigation() {
   const Stack = createNativeStackNavigator();
@@ -79,6 +80,13 @@ export default function AccountNavigation() {
         options={{
           headerTitleAlign: 'center',
           title: 'Chi tiết thông báo',
+        }}
+      />
+      <Stack.Screen
+        name="DetailPost"
+        component={DetailPost}
+        options={{
+          headerTitle: 'Chi tiết bài viết',
         }}
       />
     </Stack.Navigator>
