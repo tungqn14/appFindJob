@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import BlockPost from '../component/BlockPost';
 import RenderHtml from 'react-native-render-html';
-import { server } from "../config";
+import {server} from '../config';
 
 import {
   getTypeRank,
@@ -354,7 +354,9 @@ function DetailPost({route, navigation, user}) {
         </View>
         <View style={styles.botDetailPost}>
           <TouchableOpacity
-            onPress={savePost}
+            onPress={() => {
+              savePost();
+            }}
             style={[
               styles.btnApply,
               {backgroundColor: 'white', borderColor: 'blue'},
@@ -365,7 +367,9 @@ function DetailPost({route, navigation, user}) {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={checkCV}
+            onPress={() => {
+              checkCV();
+            }}
             style={[styles.btnApply, {backgroundColor: '#e24c32'}]}>
             <Text
               style={{
@@ -392,7 +396,10 @@ function DetailPost({route, navigation, user}) {
               </View>
               <View style={styles.v_row_end}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate('AccountNavigation')}
+                  onPress={() => {
+                    setModalNotify(false);
+                    navigation.navigate('AccountNavigation');
+                  }}
                   style={[
                     styles.btnApply,
                     {backgroundColor: 'white', borderColor: 'blue', width: 110},
@@ -437,7 +444,9 @@ function DetailPost({route, navigation, user}) {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => applyPost(user.cv, user.fullName, user.phone)}
+                  onPress={() => {
+                    applyPost(user.cv, user.fullName, user.phone);
+                  }}
                   style={[
                     styles.btnApply,
                     {backgroundColor: '#e24c32', width: 110},
@@ -493,11 +502,16 @@ function DetailPost({route, navigation, user}) {
                     borderColor: 'gray',
                     paddingHorizontal: 20,
                   }}
-                  onPress={choosePDF}>
+                  onPress={() => {
+                    choosePDF();
+                  }}>
                   <Text>CV</Text>
                   <Text>{namePDF}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => applyPost(cv, name, phone)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    applyPost(cv, name, phone);
+                  }}>
                   <View style={styles.box_style}>
                     <Text style={{color: '#fff', fontWeight: 'bold'}}>
                       Ứng tuyển

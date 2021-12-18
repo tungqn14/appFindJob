@@ -44,7 +44,11 @@ export default function Favorite({navigation, route}) {
         dataListPost.map((item, index) => (
           <ItemPost
             key={index}
-            onPress={() => null}
+            onPress={() => {
+              navigation.navigate('DetailPost', {
+                idPost: item.id_post,
+              });
+            }}
             titlePost={item.titlePost}
             address={item.users.company.location.name}
             wage={item.wage}
