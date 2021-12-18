@@ -429,7 +429,10 @@ function DetailPost({route, navigation, user}) {
               </View>
               <View style={styles.v_row_end}>
                 <TouchableOpacity
-                  onPress={() => setModalApply(true)}
+                  onPress={() => {
+                    setModalSelect(false)
+                    setModalApply(true)
+                  }}
                   style={[
                     styles.btnApply,
                     {backgroundColor: '#e24c32', width: 110},
