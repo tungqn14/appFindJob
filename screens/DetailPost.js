@@ -33,13 +33,13 @@ import {getDownloadURL, getStorage, ref, uploadBytes} from 'firebase/storage';
 import DocumentPicker from 'react-native-document-picker';
 import {initializeApp} from 'firebase/app';
 const firebaseConfig = {
-  apiKey: 'AIzaSyDQmc3eNGNE-0ZUUaXRnAaLRSuwnjXrnsw',
-  authDomain: 'searchjob-f2a8d.firebaseapp.com',
-  projectId: 'searchjob-f2a8d',
-  storageBucket: 'searchjob-f2a8d.appspot.com',
-  messagingSenderId: '468637862865',
-  appId: '1:468637862865:web:a80d80cb5fe0cb5386aef0',
-  measurementId: 'G-FC47WF0V6Q',
+  apiKey: "AIzaSyDs5GNJVK0SHBzFBEV7EBcEuSRsUIpxdRo",
+  authDomain: "managefile-5efc5.firebaseapp.com",
+  projectId: "managefile-5efc5",
+  storageBucket: "managefile-5efc5.appspot.com",
+  messagingSenderId: "360539089372",
+  appId: "1:360539089372:web:fb94699028428317798719",
+  measurementId: "G-6TRY8WLKW6"
 };
 const firebaseApp = initializeApp(firebaseConfig);
 const storage = getStorage(firebaseApp);

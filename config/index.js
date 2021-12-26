@@ -1,1 +1,1 @@
-export const server = 'https://tungfindjob.herokuapp.com/api';
+export const server = 'https://job.hvcodes.com/api';
